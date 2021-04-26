@@ -1,6 +1,7 @@
+# import libraries
 import nltk
 
-nltk.download(['punkt', 'wordnet', 'averaged_perceptron_tagger'])
+nltk.download(['punkt', 'wordnet'])
 
 import re
 import pandas as pd
@@ -12,7 +13,7 @@ url_regex = 'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-
 lemmatizer = WordNetLemmatizer()
 
 
-def tokenize(text):
+def tokenizer(text):
     detected_urls = re.findall(url_regex, text)
     for url in detected_urls:
         text = text.replace(url, "urlplaceholder")
@@ -32,7 +33,7 @@ class StartingVerbExtractor(BaseEstimator, TransformerMixin):
     def starting_verb(self, text):
         sentence_list = nltk.sent_tokenize(text)
         for sentence in sentence_list:
-            pos_tags = nltk.pos_tag(tokenize(sentence))
+            pos_tags = nltk.pos_tag(tokenizer(sentence))
             first_word, first_tag = pos_tags[0]
             if first_tag in ['VB', 'VBP'] or first_word == 'RT':
                 return True

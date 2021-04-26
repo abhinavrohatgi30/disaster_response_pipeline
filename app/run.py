@@ -1,3 +1,6 @@
+import sys
+sys.path.insert(0, '../models/')
+
 import json
 import plotly
 import pandas as pd
@@ -8,8 +11,9 @@ from nltk.tokenize import word_tokenize
 from flask import Flask
 from flask import render_template, request, jsonify
 from plotly.graph_objs import Bar
-from sklearn.externals import joblib
+import joblib
 from sqlalchemy import create_engine
+from custom_transformer import StartingVerbExtractor, tokenizer
 
 app = Flask(__name__)
 
@@ -28,7 +32,7 @@ def tokenize(text):
 
 # load data
 engine = create_engine('sqlite:///../data/DisasterResponse.db')
-df = pd.read_sql_table('YourTableName', engine)
+df = pd.read_sql_table('DisasterMessages', engine)
 
 # load model
 model = joblib.load("../models/classifier.pkl")

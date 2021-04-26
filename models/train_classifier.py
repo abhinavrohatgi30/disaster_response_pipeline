@@ -1,4 +1,8 @@
 # import libraries
+import nltk
+
+nltk.download(['punkt', 'wordnet'])
+
 import pandas as pd
 from sqlalchemy.engine import create_engine
 from sklearn.ensemble import RandomForestClassifier
@@ -7,19 +11,24 @@ from sklearn.pipeline import Pipeline, FeatureUnion
 from sklearn.multioutput import MultiOutputClassifier
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from sklearn.metrics import classification_report
-import pickle
-from models.custom_transformer import StartingVerbExtractor, tokenize
+import joblib
+from custom_transformer import StartingVerbExtractor, tokenizer
 import sys
 
 
 def load_data(database_filepath):
     engine = create_engine('sqlite:///' + database_filepath)
     df = pd.read_sql_table('DisasterMessages', con=engine)
-    return df
+    colnames = ['related', 'request', 'offer', 'aid_related', 'medical_help', 'medical_products', 'search_and_rescue',
+                'security', 'military', 'child_alone', 'water', 'food', 'shelter', 'clothing', 'money',
+                'missing_people', 'refugees', 'death', 'other_aid', 'infrastructure_related', 'transport', 'buildings',
+                'electricity', 'tools', 'hospitals', 'shops', 'aid_centers', 'other_infrastructure', 'weather_related',
+                'floods', 'storm', 'fire', 'earthquake', 'cold', 'other_weather', 'direct_report']
+    return df['message'], df[colnames], colnames
 
 
 def tokenize(text):
-    return tokenize(text)
+    return tokenizer(text)
 
 
 def build_model():
@@ -43,13 +52,13 @@ def build_model():
 def evaluate_model(model, X_test, Y_test, category_names):
     y_pred = model.predict(X_test)
     Y_pred = pd.DataFrame(y_pred, columns=category_names)
-    for name in Y_pred.columns:
+    for name in category_names:
         print(name)
         print(classification_report(Y_test[name], Y_pred[name]))
 
 
 def save_model(model, model_filepath):
-    pickle.dump(model, open(model_filepath, 'wb'))
+    joblib.dump(model, open(model_filepath, 'wb'))
 
 
 def main():

@@ -21,7 +21,7 @@ def clean_data(df):
     # select the first row of the categories dataframe
     row = categories.head(1)
 
-    category_colnames = [value[0:-2] for value in row.get_values()[0]]
+    category_colnames = [value[0:-2] for value in row.values[0]]
 
     # rename the columns of `categories`
     categories.columns = category_colnames
