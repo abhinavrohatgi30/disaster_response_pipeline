@@ -31,7 +31,7 @@ def clean_data(df):
         categories[column] = categories[column].apply(lambda x: x[-1])
 
         # convert column from string to numeric
-        categories[column] = categories[column].apply(lambda x: int(x))
+        categories[column] = categories[column].apply(lambda x: None if int(x) > 1 else int(x))
 
     # drop the original categories column from `df`
     df = df.drop('categories', axis=1)
@@ -39,12 +39,16 @@ def clean_data(df):
     # concatenate the original dataframe with the new `categories` dataframe
     df = pd.concat([df, categories], axis=1)
 
+    df = df.dropna(how="any")
+
     # Remove duplicate data
     df = df.drop_duplicates(subset='message', keep="last")
     return df
 
 
 def save_data(df, database_filename):
+    # Saves the data into a database file on the file system
+
     engine = create_engine('sqlite:///' + database_filename)
     df.to_sql('DisasterMessages', engine, index=False)
 

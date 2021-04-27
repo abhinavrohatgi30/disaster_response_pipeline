@@ -17,6 +17,12 @@ import sys
 
 
 def load_data(database_filepath):
+    """
+    Loads the data from the filesystem
+    :param database_filepath: The path on the file system where the processed data is stored
+    :return: the feature variables and target variables to be used to train and test the model
+    """
+
     engine = create_engine('sqlite:///' + database_filepath)
     df = pd.read_sql_table('DisasterMessages', con=engine)
     colnames = ['related', 'request', 'offer', 'aid_related', 'medical_help', 'medical_products', 'search_and_rescue',
@@ -32,6 +38,8 @@ def tokenize(text):
 
 
 def build_model():
+    # Defines the pipeline to be used to build the model
+
     pipeline = Pipeline([
         ('features', FeatureUnion([
 
@@ -50,6 +58,15 @@ def build_model():
 
 
 def evaluate_model(model, X_test, Y_test, category_names):
+    """
+    Evaluates the accuracy, precision, recall and f1 score for every category individually
+    :param model: the model to be evaluated
+    :param X_test: The test features to be evaluated
+    :param Y_test: The test output to be evaluated against
+    :param category_names: the name of all the categories for which the metrics need to be generated
+    :return: None
+    """
+
     y_pred = model.predict(X_test)
     Y_pred = pd.DataFrame(y_pred, columns=category_names)
     for name in category_names:
@@ -58,6 +75,12 @@ def evaluate_model(model, X_test, Y_test, category_names):
 
 
 def save_model(model, model_filepath):
+    """
+     Saves the model onto the filesystem in a serialized form
+    :param model: The model to be saved
+    :param model_filepath: the path on the file system
+    :return: None
+    """
     joblib.dump(model, open(model_filepath, 'wb'))
 
 
