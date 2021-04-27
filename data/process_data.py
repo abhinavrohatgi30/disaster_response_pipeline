@@ -4,6 +4,12 @@ from sqlalchemy import create_engine
 
 
 def load_data(messages_filepath, categories_filepath):
+    """
+    Loads the message data and categories data into a single dataframe
+    :param messages_filepath: Message data file path
+    :param categories_filepath: Categories data file path
+    :return: Merged dataframe
+    """
     # load messages dataset
     messages = pd.read_csv(messages_filepath)
 
@@ -16,6 +22,12 @@ def load_data(messages_filepath, categories_filepath):
 
 
 def clean_data(df):
+    """
+    The raw data in the dataframe is cleaned, structured, de-duplicated and processed
+    :param df: The dataframe containing the raw data
+    :return: cleaned dataframe
+    """
+
     categories = df.categories.str.split(";", expand=True)
 
     # select the first row of the categories dataframe
@@ -39,7 +51,8 @@ def clean_data(df):
     # concatenate the original dataframe with the new `categories` dataframe
     df = pd.concat([df, categories], axis=1)
 
-    df = df.dropna(how="any")
+    # dropping rows having null values in any of the category columns
+    df = df.dropna(subset=category_colnames, how="any")
 
     # Remove duplicate data
     df = df.drop_duplicates(subset='message', keep="last")
@@ -47,7 +60,12 @@ def clean_data(df):
 
 
 def save_data(df, database_filename):
-    # Saves the data into a database file on the file system
+    """
+    Saves the data into a database file on the file system
+    :param df: Dataframe to save
+    :param database_filename: File path of the processed dataframe
+    :return: None
+    """
 
     engine = create_engine('sqlite:///' + database_filename)
     df.to_sql('DisasterMessages', engine, index=False)

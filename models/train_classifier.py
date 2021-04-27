@@ -38,7 +38,10 @@ def tokenize(text):
 
 
 def build_model():
-    # Defines the pipeline to be used to build the model
+    """
+    Defines the pipeline to be used to build the model
+    :return: ML Pipeline
+    """
 
     pipeline = Pipeline([
         ('features', FeatureUnion([
